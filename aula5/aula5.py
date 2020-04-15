@@ -1,9 +1,9 @@
-#Objetivo: Impedir de reenviar o formulário ao recarregar a página, adicionar bootstrap, 
-#           evitar duplicação de código e adicionar url dinâmica
+#Objetivo: Criar uma tela de login, autenticar usuarios
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session, flash
 
 app = Flask(__name__)
+app.secret_key = 'gabriel'
 
 class Jogo:
     def __init__(self, nome, categoria, console):
@@ -36,6 +36,26 @@ def criar():
     novo_jogo = Jogo(nome, categoria, console)
     lista_jogos.append(novo_jogo)
     return redirect('/') #redirecionando para o index
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/autenticar', methods=['POST',])
+def autenticar():
+    if 'mestra' == request.form['senha']:
+        session['usuario_logado'] = request.form['usuario']
+        flash(request.form['usuario'] + ' logou com sucesso')
+        return redirect('/')
+    else :
+        flash('Senha incorreta!! Tente novamente')
+        return redirect ('/login')
+
+@app.route('/logout')
+def logout():
+    session['usuario_logado'] = None
+    flash('Usuário desconectado')
+    return redirect('/')
 
 app.run()
 #app.run(host='0.0.0.0', port=8080) - se quiser configurar manualmente o servidor e a porta 
